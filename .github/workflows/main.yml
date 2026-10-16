@@ -3,17 +3,29 @@ name: C++ to EXE
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches:
+      - main
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install C++ compiler
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: mingw-w64-x86_64-gcc
 
       - name: Compile C++
-        shell: bash
+        shell: msys2 {0}
         run: g++ main.cpp -o main.exe
 
       - name: Upload EXE
@@ -21,3 +33,4 @@ jobs:
         with:
           name: main-exe
           path: main.exe
+          if-no-files-found: error
